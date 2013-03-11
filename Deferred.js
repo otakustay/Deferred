@@ -21,7 +21,8 @@
                 for (var i = 0; i < callbacks.length; i++) {
                     var callback = callbacks[i];
                     try {
-                        callback.apply(deferred, deferred._args);
+                            // 回调时的this应该是`Promise`，没有`resolve`等方法
+                            callback.apply(deferred.promise(), deferred._args);
                     }
                     catch (ex) {
                     }
@@ -55,7 +56,8 @@
             // - 如果`callback`抛出异常，则用异常改`deferred`为**rejected**
             if (typeof callback === 'function') {
                 try {
-                    var returnValue = callback.apply(this, arguments);
+                    var returnValue = 
+                        callback.apply(original.promise(), arguments);
 
                     if (Deferred.isPromise(returnValue)) {
                         returnValue.then(
